@@ -3,12 +3,22 @@
 ## Hardware
 
 STM32 Nucleo-32 development board with STM32G031K8 MCU:
-* Arm Cortex-M0+ at 64 MHz
-* Accurate internal high speed clock +/-1% for 0/90°C
+* Arm Cortex-M0+
 * Flash memory: 64 Kbyte
 * SRAM: 8 Kbyte
 * Communication: 2 x I2C + 2 x USART
-* ~10 $
+* Price: ~10 $
+* Package: LQFP32
+
+Clock:
+* LSE at PC14-PC15: 32.768KHz
+* HSI: 16 MHz internal RC clock
+* HSE: N/A
+* SYSCLK: LSE | LSI | PLLRCLK | HSISYS
+  * Max: 64 MHz with PLLRCLK
+* PLLQCLK -- TIM1 : max 128 MHz
+* PLLPCLK -- ADC  : max 122 MHz
+
 
 Schematic info:
 * User LED (LD3) -- PC6 -- AF1=TIM3_CH1, AF2 = TIM2_CH3
@@ -22,3 +32,5 @@ Schematic info:
 ### Delay loop
 
 User LED is toggled with a for loop delay.
+
+### Max clock out

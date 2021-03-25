@@ -1,4 +1,5 @@
 proj/*/bin
 proj/*/obj
+doc
 *.swp
 STM32CubeG0
