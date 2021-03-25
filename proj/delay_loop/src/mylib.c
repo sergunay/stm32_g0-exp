@@ -20,7 +20,7 @@ __INLINE void GPIOC_Config(unsigned int pinNum, unsigned int pinMode)
 
 	// Select output mode 0
 	GPIOC->MODER &= ~(0x3UL << 2*pinNum);
-    GPIOC->MODER |= (pinMode << 2*pinNum);
+	GPIOC->MODER |= (pinMode << 2*pinNum);
 }
 
 // --------------------------------------------------------------------------------
@@ -36,7 +36,7 @@ __INLINE void GPIOC_Toggle(unsigned int pinNum)
 
 void Delay_Loop(unsigned int time)
 {
-    for (unsigned int i = 0; i < time; i++)
-        for (volatile unsigned int j = 0; j < 1000; j++);
+	for (unsigned int i = 0; i < time; i++)
+		for (volatile unsigned int j = 0; j < 1000; j++);
 }
 
