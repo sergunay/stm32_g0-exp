@@ -1,0 +1,16 @@
+void Delay_Loop(unsigned int);
+void GPIOA_Config(unsigned int, unsigned int);
+void GPIOB_Config(unsigned int, unsigned int);
+void GPIOC_Config(unsigned int, unsigned int);
+void GPIOB_AFSel(unsigned int, unsigned int);
+void GPIOC_AFSel(unsigned int, unsigned int);
+void GPIOC_Toggle(unsigned int);
+void GPIOB_Toggle(unsigned int);
+void TIM3_CH1_PWM(uint32_t, uint32_t);
+void TIM3_UIF_IRQ(uint32_t);
+void RCC_SysClk_PLL_HSI(unsigned int, unsigned int, unsigned int);
+void RCC_SysClk_HSI(void);
+void USART1_Write(const char *);
+void USART1_Setup(int, int, char);
+void ADC_Config(unsigned int chNum);
+int ADC_Read(void);
