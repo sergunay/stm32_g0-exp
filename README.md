@@ -14,6 +14,7 @@ Clock:
 * LSE at PC14-PC15: 32.768KHz
 * HSI: 16 MHz internal RC clock
 * HSE: N/A
+
 * SYSCLK: LSE | LSI | PLLRCLK | HSISYS
   * Max: 64 MHz with PLLRCLK
 * PLLQCLK -- TIM1 : max 128 MHz
@@ -33,4 +34,10 @@ Schematic info:
 
 User LED is toggled with a for loop delay.
 
+### PWM LED
+
+LED dimming with Timer PWM output.
+
 ### Max clock out
+
+
