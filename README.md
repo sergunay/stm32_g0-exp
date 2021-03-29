@@ -23,6 +23,14 @@ Clock:
 
 Schematic info:
 * User LED (LD3) -- PC6 -- AF1=TIM3_CH1, AF2 = TIM2_CH3
+* User Button (B1) -- PF2 
+
+Timers
+* TIM1: Advanced Control Timer. 16-bit, 4x Capture/Compare Channels, max 128 MHz.
+* TIM2: General Purpose. 32-bit, 4x Capture/Compare Channels, max 64 MHz.
+* TIM3: General Purpose. 16-bit, 4x Capture/Compare Channels, max 64 MHz.
+
+
 
 ## Setup
 
@@ -39,5 +47,6 @@ User LED is toggled with a for loop delay.
 LED dimming with Timer PWM output.
 
 ### Max clock out
+
 
 

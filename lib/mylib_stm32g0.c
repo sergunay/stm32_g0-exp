@@ -63,6 +63,31 @@ __INLINE void GPIOC_Config(unsigned int pinNum, unsigned int pinMode)
 	GPIOC->MODER |= (pinMode << 2*pinNum);
 }
 
+
+
+
+// --------------------------------------------------------------------------------
+
+/**
+  * @brief  This function configures the selected GPIOB pin.
+  * @param  pinNum
+  * @param  pinMode  0 = IN, 1 = OUT, 2 = AF
+  * @retval None
+  *
+  */
+
+__INLINE void GPIOF_Config(unsigned int pinNum, unsigned int pinMode)
+{
+	// Enable the peripheral clock of GPIOB
+	RCC->IOPENR |= RCC_IOPENR_GPIOFEN;
+
+	// Select output mode
+	GPIOF->MODER &= ~(0x3UL << 2*pinNum);
+	GPIOF->MODER |= (pinMode << 2*pinNum);
+}
+
+
+
 // --------------------------------------------------------------------------------
 
 /**
@@ -273,7 +298,7 @@ __INLINE void USART1_Setup(int sys_clk_freq, int uart_baud_rate, char parity)
 	// Parity control enable
 	USART1->CR1 |= USART_CR1_PCE;
 
-	switch (parity) 
+	switch (parity)
 	{
 		case 'O':
 			// Parity control enable
@@ -299,10 +324,10 @@ __INLINE void USART1_Setup(int sys_clk_freq, int uart_baud_rate, char parity)
 __INLINE void USART1_Write(const char *text)
 {
 	const char *tx_ptr = text;
-	while(*tx_ptr) 
+	while(*tx_ptr)
 	{
 		USART1->TDR = *tx_ptr;
-		// Wait until Transmit Data Register Empty 
+		// Wait until Transmit Data Register Empty
 		while ((USART1->ISR & USART_ISR_TXE_TXFNF) == 0);
 		tx_ptr++;
 	}
