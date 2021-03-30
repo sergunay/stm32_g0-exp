@@ -16,14 +16,22 @@ int main(void)
 	GPIOC_Config(6, 1);
 
 	// GPIOF(2) : input
-	GPIOF_Config(2, 0);
+	Button_PF2_Config();
 
 	__enable_irq();
 
 	while (1)
 	{
-		tmp = Button_In();
-		GPIOC->ODR = (tmp << 6);
+		tmp = Button_PF2_In();
+		if(tmp == 0)
+		{
+			GPIOC_Set(6);
+		}
+		else
+		{
+			GPIOC_Reset(6);
+		}
+		
 	}
 
 	return 0;

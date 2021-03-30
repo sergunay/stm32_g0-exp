@@ -57,6 +57,28 @@ __INLINE void GPIOC_Toggle(unsigned int pinNum)
 	GPIOC->ODR ^= (0x1UL << pinNum);
 }
 
+/**
+  * @brief  This function toggles GPIOCx pin.
+  * @param  pinNum
+  * @retval None
+  *
+  */
+__INLINE void GPIOC_Set(unsigned int pinNum)
+{
+	GPIOC->ODR |= (0x1UL << pinNum);
+}
+
+
+/**
+  * @brief  This function toggles GPIOCx pin.
+  * @param  pinNum
+  * @retval None
+  *
+  */
+__INLINE void GPIOC_Reset(unsigned int pinNum)
+{
+	GPIOC->ODR &= ~(0x1UL << pinNum);
+}
 
 
 // --------------------------------------------------------------------------------
@@ -89,7 +111,7 @@ __INLINE void GPIOF_Config(unsigned int pinNum, unsigned int pinMode)
   *
   */
 
-__INLINE void Button_Config()
+__INLINE void Button_PF2_Config()
 {
 	GPIOF_Config(2, 0);
 
@@ -97,7 +119,7 @@ __INLINE void Button_Config()
 	GPIOF->PUPDR |= (0x1UL << 4);
 }
 
-int Button_In()
+int Button_PF2_In()
 {
 	return (GPIOF->IDR & (1<<2)) >> 2;
 }
