@@ -146,6 +146,62 @@ __INLINE void GPIOC_Toggle(unsigned int pinNum)
 	GPIOC->ODR ^= (0x1UL << pinNum);
 }
 
+/**
+  * @brief  This function toggles GPIOCx pin.
+  * @param  pinNum
+  * @retval None
+  *
+  */
+__INLINE void GPIOC_Set(unsigned int pinNum)
+{
+	GPIOC->ODR |= (0x1UL << pinNum);
+}
+
+
+/**
+  * @brief  This function toggles GPIOCx pin.
+  * @param  pinNum
+  * @retval None
+  *
+  */
+__INLINE void GPIOC_Reset(unsigned int pinNum)
+{
+	GPIOC->ODR &= ~(0x1UL << pinNum);
+}
+
+/**
+  * @brief  This function configures the selected GPIOB pin.
+  * @param  pinNum
+  * @param  pinMode  0 = IN, 1 = OUT, 2 = AF
+  * @retval None
+  *
+  */
+
+__INLINE void Button_PF2_Config()
+{
+	GPIOF_Config(2, 0);
+
+	GPIOF->PUPDR &= ~(0x3UL << 4);
+	GPIOF->PUPDR |= (0x1UL << 4);
+}
+
+int Button_PF2_In()
+{
+	return (GPIOF->IDR & (1<<2)) >> 2;
+}
+
+/**
+  * @brief  This function toggles GPIOCx pin.
+  * @param  pinNum
+  * @retval None
+  *
+  */
+__INLINE void GPIOF_Toggle(unsigned int pinNum)
+{
+	GPIOF->ODR ^= (0x1UL << pinNum);
+}
+
+
 
 // --------------------------------------------------------------------------------
 // SYSCLK Functions

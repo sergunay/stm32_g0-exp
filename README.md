@@ -23,7 +23,7 @@ Clock:
 
 Schematic info:
 * User LED (LD3) -- PC6 -- AF1=TIM3_CH1, AF2 = TIM2_CH3
-* User Button (B1) -- PF2 
+* User Button (B1) -- PF2, needs pullup resistor 
 
 Timers
 * TIM1: Advanced Control Timer. 16-bit, 4x Capture/Compare Channels, max 128 MHz.
@@ -33,7 +33,7 @@ Timers
 
 
 ## Setup
-
+ 
 	git clone https://github.com/STMicroelectronics/STM32CubeG0
 
 ## Experiments
@@ -45,6 +45,10 @@ User LED is toggled with a for loop delay.
 ### PWM LED
 
 LED dimming with Timer PWM output.
+
+### Button polling
+
+### Button interrupt
 
 ### Max clock out
 
