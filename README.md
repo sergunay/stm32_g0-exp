@@ -50,7 +50,11 @@ LED dimming with Timer PWM output.
 
 ### Button interrupt
 
-### Max clock out
+### Clock out
+
+MCO (Microcontroller Clock Output).
+
+### Frequency measurement
 
 
 

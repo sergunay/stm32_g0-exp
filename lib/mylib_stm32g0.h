@@ -1,5 +1,6 @@
 void Delay_Loop(unsigned int);
 void GPIOA_Config(unsigned int, unsigned int);
+void GPIOA_OSpeed(unsigned int, unsigned int);
 void GPIOB_Config(unsigned int, unsigned int);
 void GPIOC_Config(unsigned int, unsigned int);
 void GPIOB_AFSel(unsigned int, unsigned int);
@@ -19,3 +20,4 @@ void USART1_Write(const char *);
 void USART1_Setup(int, int, char);
 void ADC_Config(unsigned int chNum);
 int ADC_Read(void);
+void MCO_PLLRCLK_64MHz();
