@@ -5,107 +5,32 @@
 // GPIO Functions
 // --------------------------------------------------------------------------------
 
-/**
-  * @brief  This function configures the selected GPIOA pin.
-  * @param  pinNum
-  * @param  pinMode  0 = IN, 1 = OUT, 2 = AF
-  * @retval None
-  *
-  */
 
-__INLINE void GPIOA_Config(unsigned int pinNum, unsigned int pinMode)
-{
-	// Enable the peripheral clock of GPIOA
-	RCC->IOPENR |= RCC_IOPENR_GPIOAEN;
 
-	// Select output mode
-	GPIOA->MODER &= ~(0x3UL << 2*pinNum);
-	GPIOA->MODER |= (pinMode << 2*pinNum);
-}
+
+
+
+
 
 /**
   * @brief  This function configures the speed of the selected GPIOA pin.
+  * @details Conditions: C=10 pF, 2.7V ≤ VDDIO1 ≤ 3.6V
   * @param  pinNum
-  * @param  speed  0 = 3MHz, 1 = 15MHz, 2 = 60MHz, 3 = 80MHz
+  * @param  speed  0 = <3MHz, 1 = <15MHz, 2 = <60MHz, 3 = <80MHz
   * @retval None
   *
   */
 
 __INLINE void GPIOA_OSpeed(unsigned int pinNum, unsigned int speed)
 {
-  // C=10 pF, 2.7V ≤ VDDIO1 ≤ 3.6V =>
-  //   0: 3 MHz; 1: 15 MHz; 2:60 MHz; 3: 80 MHz
-
 	GPIOA->OSPEEDR &= ~(0x3UL << 2*pinNum);
 	GPIOA->OSPEEDR |= (speed << 2*pinNum);
 }
 
 // --------------------------------------------------------------------------------
-
-/**
-  * @brief  This function configures the selected GPIOB pin.
-  * @param  pinNum
-  * @param  pinMode  0 = IN, 1 = OUT, 2 = AF
-  * @retval None
-  *
-  */
-
-__INLINE void GPIOB_Config(unsigned int pinNum, unsigned int pinMode)
-{
-	// Enable the peripheral clock of GPIOB
-	RCC->IOPENR |= RCC_IOPENR_GPIOBEN;
-
-	// Select output mode
-	GPIOB->MODER &= ~(0x3UL << 2*pinNum);
-	GPIOB->MODER |= (pinMode << 2*pinNum);
-}
-
+// GPIOB Functions
 // --------------------------------------------------------------------------------
 
-/**
-  * @brief  This function configures the selected GPIOC pin.
-  * @param  pinNum
-  * @param  pinMode  0 = IN, 1 = OUT, 2 = AF
-  * @retval None
-  *
-  */
-
-__INLINE void GPIOC_Config(unsigned int pinNum, unsigned int pinMode)
-{
-	// Enable the peripheral clock of GPIOC
-	RCC->IOPENR |= RCC_IOPENR_GPIOCEN;
-
-	// Select output mode 0
-	GPIOC->MODER &= ~(0x3UL << 2*pinNum);
-	GPIOC->MODER |= (pinMode << 2*pinNum);
-}
-
-
-
-
-// --------------------------------------------------------------------------------
-
-/**
-  * @brief  This function configures the selected GPIOB pin.
-  * @param  pinNum
-  * @param  pinMode  0 = IN, 1 = OUT, 2 = AF
-  * @retval None
-  *
-  */
-
-__INLINE void GPIOF_Config(unsigned int pinNum, unsigned int pinMode)
-{
-	// Enable the peripheral clock of GPIOB
-	RCC->IOPENR |= RCC_IOPENR_GPIOFEN;
-
-	// Select output mode
-	GPIOF->MODER &= ~(0x3UL << 2*pinNum);
-	GPIOF->MODER |= (pinMode << 2*pinNum);
-}
-
-
-
-// --------------------------------------------------------------------------------
 
 /**
   * @brief  This function selects the alternate function of a GPIOB pin.
@@ -122,6 +47,10 @@ __INLINE void GPIOB_AFSel(unsigned int pinNum, unsigned int afNum)
 }
 
 // --------------------------------------------------------------------------------
+// GPIOC Functions
+// --------------------------------------------------------------------------------
+
+
 
 /**
   * @brief  This function selects the alternate function of a GPIOC pin.
@@ -138,6 +67,25 @@ __INLINE void GPIOC_AFSel(unsigned int pinNum, unsigned int afNum)
 }
 
 // --------------------------------------------------------------------------------
+// GPIOF Functions
+// --------------------------------------------------------------------------------
+
+/**
+  * @brief  This function configures the selected GPIOF pin.
+  * @param  pinNum
+  * @param  pinMode  0 = IN, 1 = OUT, 2 = AF
+  * @retval None
+  *
+  */
+__INLINE void GPIOF_Config(unsigned int pinNum, unsigned int pinMode)
+{
+	// Enable the peripheral clock of GPIOB
+	RCC->IOPENR |= RCC_IOPENR_GPIOFEN;
+
+	// Select output mode
+	GPIOF->MODER &= ~(0x3UL << 2*pinNum);
+	GPIOF->MODER |= (pinMode << 2*pinNum);
+}
 
 /**
   * @brief  This function toggles GPIOBx pin.

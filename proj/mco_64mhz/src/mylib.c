@@ -2,21 +2,22 @@
 #include "mylib.h"
 
 /**
-  * @brief  This function configures the selected GPIOA pin.
+  * @brief  This function configures the selected port/pin
+  * @param  PORT     GPIOA, GPIOB, GPIOC, GPIOF
   * @param  pinNum
   * @param  pinMode  0 = IN, 1 = OUT, 2 = AF
   * @retval None
   *
   */
 
-__INLINE void GPIOA_Config(unsigned int pinNum, unsigned int pinMode)
+__INLINE void GPIOA_Config(GPIO_TypeDef * PORT, unsigned int pinNum, unsigned int pinMode)
 {
 	// Enable the peripheral clock of GPIOA
 	RCC->IOPENR |= RCC_IOPENR_GPIOAEN;
 
 	// Select output mode
-	GPIOA->MODER &= ~(0x3UL << 2*pinNum);
-	GPIOA->MODER |= (pinMode << 2*pinNum);
+	PORT->MODER &= ~(0x3UL << 2*pinNum);
+	PORT->MODER |= (pinMode << 2*pinNum);
 }
 
 /**

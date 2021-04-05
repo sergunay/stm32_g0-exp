@@ -5,7 +5,7 @@ int main(void)
 {
 	__disable_irq();
 
-	GPIOA_Config(9, 2);
+	GPIOA_Config(GPIOA, 9, 2);
 	GPIOA_OSpeed(9, 3);
 	MCO_PLLRCLK_64MHz();
 

@@ -1,8 +1,6 @@
 void Delay_Loop(unsigned int);
-void GPIOA_Config(unsigned int, unsigned int);
+void GPIO_Config(unsigned int, unsigned int);
 void GPIOA_OSpeed(unsigned int, unsigned int);
-void GPIOB_Config(unsigned int, unsigned int);
-void GPIOC_Config(unsigned int, unsigned int);
 void GPIOB_AFSel(unsigned int, unsigned int);
 void GPIOC_AFSel(unsigned int, unsigned int);
 void GPIOC_Toggle(unsigned int);
