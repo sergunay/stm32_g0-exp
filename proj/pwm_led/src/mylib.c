@@ -2,35 +2,45 @@
 #include "mylib.h"
 
 /**
-  * @brief  This function configures the selected GPIOC pin.
-  * @param  pinNum
-  * @param  pinMode  0 = IN, 1 = OUT, 2 = AF
+  * @brief  GPIO port clock enable
+  * @param  portNum 0:A, 1:B, 2:C, 3:D, 5:F
   * @retval None
+  * @example GPIO_Enable(2); // Enable GPIOC port
   *
   */
-
-__INLINE void GPIOC_Config(unsigned int pinNum, unsigned int pinMode)
+__INLINE void GPIO_Enable(unsigned int portNum)
 {
-  // Enable the peripheral clock of GPIOC
-	RCC->IOPENR |= RCC_IOPENR_GPIOCEN;
-
-	// Select output mode 0
-	GPIOC->MODER &= ~(0x3UL << 2*pinNum);
-	GPIOC->MODER |= (pinMode << 2*pinNum);
+	RCC->IOPENR |= (1<<portNum);
 }
 
 /**
-  * @brief  This function selects the alternate function of a GPIOC pin.
+  * @brief  Select GPIO mode
+  * @param  PORT GPIOA, GPIOB, GPIOC, GPIOD, GPIOF
+  * @param  pinNum
+  * @param  pinMode 0:IN, 1:OUT, 2:AF
+  * @retval None
+  * @example GPIO_Mode(GPIOC, 6, 1);
+  *
+  */
+__INLINE void GPIO_Mode(GPIO_TypeDef *PORT, unsigned int pinNum, unsigned int pinMode)
+{
+	PORT->MODER &= ~(0x3UL << 2*pinNum);
+	PORT->MODER |= (pinMode << 2*pinNum);
+}
+
+/**
+  * @brief  This function selects the alternate function of a GPIO pin.
   * @param  pinNum
   * @param  afNum
   * @retval None
+  * @example GPIOC_AFSel(GPIOC, 6, 1);
   *
   */
 
-__INLINE void GPIOC_AFSel(unsigned int pinNum, unsigned int afNum)
+__INLINE void GPIO_AFSel(GPIO_TypeDef *PORT, unsigned int pinNum, unsigned int afNum)
 {
-	GPIOC->AFR[0] &= ~(0x15UL << 4*pinNum);
-	GPIOC->AFR[0] |= (afNum << 4*pinNum);
+	PORT->AFR[0] &= ~(0x15UL << 4*pinNum);
+	PORT->AFR[0] |= (afNum << 4*pinNum);
 }
 
 

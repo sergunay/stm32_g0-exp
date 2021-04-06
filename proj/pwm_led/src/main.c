@@ -2,17 +2,16 @@
 // Schematic info:
 //   - User LED (LD3) -- PC6 -- AF1=TIM3_CH1, AF2 = TIM2_CH3
 
-
 #include "stm32g031xx.h"
 #include "mylib.h"
 
 int main(void)
 {
 	// Set PC6 AF Mode
-	GPIOC_Config(6, 2);
+	GPIO_Mode(GPIOC, 6, 2);
 
-	// Set AF Mode 1 = TIM3_CH1
-	GPIOC_AFSel(6, 1);
+	// Set PC6 AF Mode#1 = TIM3_CH1
+	GPIO_AFSel(GPIOC, 6, 1);
 
 	while (1)
 	{
