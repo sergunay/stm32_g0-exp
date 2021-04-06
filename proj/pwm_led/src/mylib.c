@@ -33,7 +33,7 @@ __INLINE void GPIO_Mode(GPIO_TypeDef *PORT, unsigned int pinNum, unsigned int pi
   * @param  pinNum
   * @param  afNum
   * @retval None
-  * @example GPIOC_AFSel(GPIOC, 6, 1);
+  * @example GPIO_AFSel(GPIOC, 6, 1);
   *
   */
 
@@ -42,9 +42,6 @@ __INLINE void GPIO_AFSel(GPIO_TypeDef *PORT, unsigned int pinNum, unsigned int a
 	PORT->AFR[0] &= ~(0x15UL << 4*pinNum);
 	PORT->AFR[0] |= (afNum << 4*pinNum);
 }
-
-
-
 
 /**
   * @brief  This function switches the system clock to PLL
