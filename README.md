@@ -1,5 +1,14 @@
 # STM32-G0 experiments
 
+
+## Introduction
+
+Experimenting Nucleo-G031K8 board with small projects.
+Each project has minimum set of source files.
+They don't use HAL or LL libraries, instead use direct
+access to the registers with CMSIS library.
+
+
 ## Hardware
 
 STM32 Nucleo-32 development board with STM32G031K8 MCU:
@@ -47,6 +56,8 @@ User LED is toggled with a for loop delay.
 LED dimming with Timer PWM output.
 
 ### Button polling
+
+Polling user button in a loop 
 
 ### Button interrupt
 

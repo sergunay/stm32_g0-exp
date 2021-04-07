@@ -17,6 +17,9 @@ int main(void)
 	// Set AF Mode 1 = TIM3_CH1
 	GPIO_AFSel(GPIOC, 6, 1);
 
+	// Enable GPIOC port
+	TIM3_Enable(); 
+
 	while (1)
 	{
 		TIM3_CH1_PWM(100, 10);
