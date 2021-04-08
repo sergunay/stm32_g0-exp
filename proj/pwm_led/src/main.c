@@ -17,14 +17,27 @@ int main(void)
 	// Set AF Mode 1 = TIM3_CH1
 	GPIO_AFSel(GPIOC, 6, 1);
 
-	// Enable GPIOC port
+	// Enable TIM3 clock
 	TIM3_Enable(); 
+
+	// TIM3CH1 PWM mode
+	TIM_CH1_Mode(TIM3, 6); 
+
+	TIM3->PSC = 1;
+	TIM3->ARR = 100;
+	TIM3->CCR1 = 60;
+
+	// Enable CH1
+	TIM3->CCER |= TIM_CCER_CC1E;
+
+	// Enable counter
+	TIM3->CR1 |= TIM_CR1_CEN;
 
 	while (1)
 	{
-		TIM3_CH1_PWM(100, 10);
+		TIM3->CCR1 = 60;
 		Delay_Loop(1000);
-		TIM3_CH1_PWM(100, 60);
+		TIM3->CCR1 = 10;
 		Delay_Loop(1000);
 	}
 

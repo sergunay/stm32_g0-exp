@@ -37,7 +37,6 @@ void EXTI0_1_IRQHandler(void)
 
 void EXTI2_3_IRQHandler(void)
 {
-	GPIOC_Toggle(6);
 }
 
 

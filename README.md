@@ -61,11 +61,29 @@ Polling user button in a loop
 
 ### Button interrupt
 
+Handling interrupt created by the push-button.
+
 ### Clock out
 
 MCO (Microcontroller Clock Output).
+Max frequency at 64 MHz.
 
 ### Frequency measurement
+
+
+### USART
+
+
+### I2C
+
+
+### SPI
+
+
+
+
+
+
 
 
 

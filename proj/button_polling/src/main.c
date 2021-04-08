@@ -12,27 +12,39 @@ int main(void)
 
 	__disable_irq();
 
+	// GPIOC clk enable
+	GPIO_Enable(2);
+
 	// GPIOC(6) : output
-	GPIOC_Config(6, 1);
+	GPIO_Mode(GPIOC, 6, 1);
+
+	// GPIOF clk enable
+	GPIO_Enable(5);
 
 	// GPIOF(2) : input
-	Button_PF2_Config();
+	GPIO_Mode(GPIOF, 2, 0);
+
+	// Enable pullup resistor for PF2
+	GPIOF->PUPDR &= ~(0x3UL << 4);
+	GPIOF->PUPDR |= (0x1UL << 4);
 
 	__enable_irq();
 
 	while (1)
 	{
-		tmp = Button_PF2_In();
+		// Read button();
+		tmp = GPIO_Read_Bit(GPIOF, 2); 
+
 		if(tmp == 0)
 		{
-			GPIOC_Set(6);
+			// Write 1 to GPIOC(6) - User LED
+			GPIO_Write_Bit(GPIOC, 6, 1);
 		}
 		else
 		{
-			GPIOC_Reset(6);
+			// Write 0 to GPIOC(6) - User LED
+			GPIO_Write_Bit(GPIOC, 6, 0);
 		}
-		
 	}
-
 	return 0;
 }

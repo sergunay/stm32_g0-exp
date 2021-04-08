@@ -2,141 +2,58 @@
 #include "mylib.h"
 
 // --------------------------------------------------------------------------------
-//
-//
-
 
 /**
-  * @brief  This function configures the selected GPIOA pin.
-  * @param  pinNum
-  * @param  pinMode  0 = IN, 1 = OUT, 2 = AF
+  * @brief  GPIO port clock enable
+  * @param  portNum 0:A, 1:B, 2:C, 3:D, 5:F
   * @retval None
+  * @example GPIO_Enable(2); // Enable GPIOC port
   *
   */
-
-__INLINE void GPIOA_Config(unsigned int pinNum, unsigned int pinMode)
+__INLINE void GPIO_Enable(unsigned int portNum)
 {
-	// Enable the peripheral clock of GPIOA
-	RCC->IOPENR |= RCC_IOPENR_GPIOAEN;
-
-	// Select output mode
-	GPIOA->MODER &= ~(0x3UL << 2*pinNum);
-	GPIOA->MODER |= (pinMode << 2*pinNum);
-}
-
-
-
-/**
-  * @brief  This function configures the selected GPIOC pin.
-  * @param  pinNum
-  * @param  pinMode  0 = IN, 1 = OUT, 2 = AF
-  * @retval None
-  *
-  */
-
-__INLINE void GPIOC_Config(unsigned int pinNum, unsigned int pinMode)
-{
-	// Enable the peripheral clock of GPIOC
-	RCC->IOPENR |= RCC_IOPENR_GPIOCEN;
-
-	// Select mode
-	GPIOC->MODER &= ~(0x3UL << 2*pinNum);
-	GPIOC->MODER |= (pinMode << 2*pinNum);
-}
-
-// --------------------------------------------------------------------------------
-
-/**
-  * @brief  This function toggles GPIOCx pin.
-  * @param  pinNum
-  * @retval None
-  *
-  */
-__INLINE void GPIOC_Toggle(unsigned int pinNum)
-{
-	GPIOC->ODR ^= (0x1UL << pinNum);
+	RCC->IOPENR |= (1<<portNum);
 }
 
 /**
-  * @brief  This function toggles GPIOCx pin.
+  * @brief  Select GPIO mode
+  * @param  PORT GPIOA, GPIOB, GPIOC, GPIOD, GPIOF
   * @param  pinNum
+  * @param  pinMode 0:IN, 1:OUT, 2:AF
   * @retval None
+  * @example GPIO_Mode(GPIOC, 6, 1);
   *
   */
-__INLINE void GPIOC_Set(unsigned int pinNum)
+__INLINE void GPIO_Mode(GPIO_TypeDef *PORT, unsigned int pinNum, unsigned int pinMode)
 {
-	GPIOC->ODR |= (0x1UL << pinNum);
+	PORT->MODER &= ~(0x3UL << 2*pinNum);
+	PORT->MODER |= (pinMode << 2*pinNum);
 }
-
 
 /**
-  * @brief  This function toggles GPIOCx pin.
-  * @param  pinNum
-  * @retval None
+  * @brief   Read bit from a IDR of a PORT/PIN
+  * @param   PORT GPIOA, GPIOB, GPIOC, GPIOD, GPIOF
+  * @param   pinNum
+  * @param   val 0, 1
+  * @example GPIO_Write_Bit(GPIOC, 6, 1); // Write 1 to GPIOC(6) - User LED
+  * @retval  None
   *
   */
-__INLINE void GPIOC_Reset(unsigned int pinNum)
+void GPIO_Write_Bit(GPIO_TypeDef *PORT, unsigned int pinNum, unsigned int val)
 {
-	GPIOC->ODR &= ~(0x1UL << pinNum);
+  PORT->ODR &= ~(1 << pinNum);
+	PORT->ODR |= (val << pinNum);
 }
-
-
-// --------------------------------------------------------------------------------
-
 
 /**
-  * @brief  This function configures the selected GPIOB pin.
-  * @param  pinNum
-  * @param  pinMode  0 = IN, 1 = OUT, 2 = AF
-  * @retval None
+  * @brief   Read bit from a IDR of a PORT/PIN
+  * @param   PORT GPIOA, GPIOB, GPIOC, GPIOD, GPIOF
+  * @param   pinNum
+  * @example GPIO_Read_Bit(GPIOF, 2); // Read button
+  * @retval  0, 1
   *
   */
-
-__INLINE void GPIOF_Config(unsigned int pinNum, unsigned int pinMode)
+int GPIO_Read_Bit(GPIO_TypeDef *PORT, unsigned int pinNum)
 {
-	// Enable the peripheral clock of GPIOB
-	RCC->IOPENR |= RCC_IOPENR_GPIOFEN;
-
-	// Select mode
-	GPIOF->MODER &= ~(0x3UL << 2*pinNum);
-	GPIOF->MODER |= (pinMode << 2*pinNum);
-}
-
-
-/**
-  * @brief  This function configures the selected GPIOB pin.
-  * @param  pinNum
-  * @param  pinMode  0 = IN, 1 = OUT, 2 = AF
-  * @retval None
-  *
-  */
-
-__INLINE void Button_PF2_Config()
-{
-	GPIOF_Config(2, 0);
-
-	GPIOF->PUPDR &= ~(0x3UL << 4);
-	GPIOF->PUPDR |= (0x1UL << 4);
-}
-
-int Button_PF2_In()
-{
-	return (GPIOF->IDR & (1<<2)) >> 2;
-}
-
-__INLINE void Button_Setup()
-{
-	// User button PF2
-	// External interrupt selection
-	EXTI->EXTICR[0] &= ~EXTI_EXTICR1_EXTI2_Msk;
-	EXTI->EXTICR[0] |= (0x05 << EXTI_EXTICR1_EXTI2_Pos);
-
-	NVIC_EnableIRQ(EXTI2_3_IRQn);
-
-	// EXTI Interrupt Mask Register
-	EXTI->IMR1 |= (1 << 2);
-	// EXTI CPU wakeup with event mask register
-	EXTI->EMR1 |= (1 << 2);
-	// Rising trigger selection
-	EXTI->RTSR1 |= (1 << 2);
+	return (PORT->IDR & (1<<pinNum)) >> pinNum;
 }
