@@ -1,59 +1,31 @@
 #include "stm32g031xx.h"
 #include "mylib.h"
 
-
-
 /**
-  * @brief  This function configures the selected GPIOC pin.
-  * @param  pinNum
-  * @param  pinMode  0 = IN, 1 = OUT, 2 = AF
+  * @brief  GPIO port clock enable
+  * @param  portNum 0:A, 1:B, 2:C, 3:D, 5:F
   * @retval None
+  * @example GPIO_Enable(2); // Enable GPIOC port
   *
   */
-
-__INLINE void GPIOC_Config(unsigned int pinNum, unsigned int pinMode)
+__INLINE void GPIO_Enable(unsigned int portNum)
 {
-	// Enable the peripheral clock of GPIOC
-	RCC->IOPENR |= RCC_IOPENR_GPIOCEN;
-
-	// Select output mode 0
-	GPIOC->MODER &= ~(0x3UL << 2*pinNum);
-	GPIOC->MODER |= (pinMode << 2*pinNum);
+	RCC->IOPENR |= (1<<portNum);
 }
 
-// --------------------------------------------------------------------------------
-
 /**
-  * @brief  This function configures the selected GPIOB pin.
+  * @brief  Select GPIO mode
+  * @param  PORT GPIOA, GPIOB, GPIOC, GPIOD, GPIOF
   * @param  pinNum
-  * @param  pinMode  0 = IN, 1 = OUT, 2 = AF
+  * @param  pinMode 0:IN, 1:OUT, 2:AF
   * @retval None
+  * @example GPIO_Mode(GPIOC, 6, 1);
   *
   */
-
-__INLINE void GPIOF_Config(unsigned int pinNum, unsigned int pinMode)
+__INLINE void GPIO_Mode(GPIO_TypeDef *PORT, unsigned int pinNum, unsigned int pinMode)
 {
-	// Enable the peripheral clock of GPIOB
-	RCC->IOPENR |= RCC_IOPENR_GPIOFEN;
-
-	// Select output mode
-	GPIOF->MODER &= ~(0x3UL << 2*pinNum);
-	GPIOF->MODER |= (pinMode << 2*pinNum);
-}
-
-
-/**
-  * @brief  This function configures the Button pin at PF2
-  * @retval None
-  *
-  */
-
-__INLINE void Button_PF2_Config()
-{
-	GPIOF_Config(2, 0);
-
-	GPIOF->PUPDR &= ~(0x3UL << 4);
-	GPIOF->PUPDR |= (0x1UL << 4);
+	PORT->MODER &= ~(0x3UL << 2*pinNum);
+	PORT->MODER |= (pinMode << 2*pinNum);
 }
 
 __INLINE void Button_EXTI_Setup()
@@ -75,12 +47,14 @@ __INLINE void Button_EXTI_Setup()
 
 
 /**
-  * @brief  This function toggles GPIOCx pin.
+  * @brief  Toggle GPIO out reg
+  * @param  PORT GPIOA, GPIOB, GPIOC, GPIOD, GPIOF
   * @param  pinNum
   * @retval None
+  * @example GPIO_Toggle(GPIOC, 6);
   *
   */
-__INLINE void GPIOC_Toggle(unsigned int pinNum)
+__INLINE void GPIO_Toggle(GPIO_TypeDef *PORT, unsigned int pinNum)
 {
-	GPIOC->ODR ^= (0x1UL << pinNum);
+	PORT->ODR ^= (0x1UL << pinNum);
 }

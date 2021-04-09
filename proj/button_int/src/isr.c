@@ -37,7 +37,7 @@ void EXTI0_1_IRQHandler(void)
 
 void EXTI2_3_IRQHandler(void) 
 {
-  GPIOC_Toggle(6);
+  GPIO_Toggle(GPIOC, 6);
 	EXTI->RPR1 |= EXTI_RPR1_RPIF2; // clear flag
 }
 
