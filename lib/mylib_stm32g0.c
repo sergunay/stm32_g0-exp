@@ -33,6 +33,21 @@ __INLINE void GPIO_Mode(GPIO_TypeDef *PORT, unsigned int pinNum, unsigned int pi
 }
 
 /**
+  * @brief  Select GPIO speed
+  * @param  PORT GPIOA, GPIOB, GPIOC, GPIOD, GPIOF
+  * @param  pinNum
+  * @param  speed 0:3MHz; 1:15MHz; 2:60 MHz; 3:80 MHz
+  * @retval None
+  * @example GPIO_Speed(GPIOA, 9, 3);
+  *
+  */
+__INLINE void GPIO_Speed(GPIO_TypeDef *PORT, unsigned int pinNum, unsigned int speed)
+{
+	PORT->OSPEEDR &= ~(0x3UL << 2*pinNum);
+	PORT->OSPEEDR |= (speed << 2*pinNum);
+}
+
+/**
   * @brief  Toggle GPIO out reg
   * @param  PORT GPIOA, GPIOB, GPIOC, GPIOD, GPIOF
   * @param  pinNum
@@ -128,6 +143,68 @@ void TIM3_CH1_PWM(uint32_t arr, uint32_t ccr)
 }
 
 // --------------------------------------------------------------------------------
+// PLL Functions
+// --------------------------------------------------------------------------------
+
+/**
+  * @brief  Set PLL VCO
+  * @param  div 4MHz<=f<=16MHz
+  * @param  mult [8-86] 64MHz<=f<=344MHz
+  * @retval None
+  * @example PLL_SetVCO(1, 8);  // 16/1x8 = 128MHz
+  *
+  */
+void PLL_SetVCO(unsigned int div, unsigned int mult)
+{
+    uint32_t reg32;
+
+    // PLL disable
+    RCC->CR &= ~RCC_CR_PLLON;
+
+    // HSI oscillator (16 MHz) clock selected as PLL clock entry
+    RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLSRC_Msk;
+    RCC->PLLCFGR |= (RCC_PLLCFGR_PLLSRC_HSI << RCC_PLLCFGR_PLLSRC_Pos);
+
+    // Division factor M of the PLL input clock divider
+    // PLL input frequency after the /M divider must be between 4 and 16 MHz.
+    // PLLM_reg = 0 => PLLM = 1 => 16MHz
+    RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLM_Msk;
+    RCC->PLLCFGR |= ((div-1) << RCC_PLLCFGR_PLLM_Pos);
+
+    // PLL frequency multiplication factor N
+    // The PLL output frequency must be set in the range 64-344 MHz.
+    // PLLN must be between [8-86]
+    // PLLN = 8 => VCO = 16 x 8 = 128 MHz
+    RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLN_Msk;
+    RCC->PLLCFGR |= (mult << RCC_PLLCFGR_PLLN_Pos);
+
+    // Main PLL enable
+    RCC->CR |= RCC_CR_PLLON;
+    // Wait until the output is stable:
+    while ((RCC->CR & RCC_CR_PLLRDY) == 0);
+}
+
+/**
+  * @brief  Enable PLLR out
+  * @param  div [2-8] f<=64MHz
+  * @retval None
+  * @example PLLR_Enable(div);  // 128/2=64MHz
+  *
+  */
+void PLLR_Enable(unsigned int div)
+{
+    // PLLR must be between [2-8], PLLRCLK max = 64 MHz
+    // PLLR_reg = 1 => PLLR = 2 => PLLRCLK = 128/2 = 64 MHz
+    RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLR_Msk;
+    RCC->PLLCFGR |= (div << RCC_PLLCFGR_PLLR_Pos);
+
+    // Enable PLLR out
+    RCC->PLLCFGR |= RCC_PLLCFGR_PLLREN;
+}
+
+
+
+// --------------------------------------------------------------------------------
 // Other Functions
 // --------------------------------------------------------------------------------
 
@@ -145,330 +222,34 @@ void Delay_Loop(unsigned int time)
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**
-  * @brief  This function configures the speed of the selected GPIOA pin.
-  * @details Conditions: C=10 pF, 2.7V ≤ VDDIO1 ≤ 3.6V
-  * @param  pinNum
-  * @param  speed  0 = <3MHz, 1 = <15MHz, 2 = <60MHz, 3 = <80MHz
+  * @brief  Select MCO
+  * @param  src 1:SYSCLK, 3:HSI, 4:HSE, 5:PLLR, 6:LSI, 7:LSE
   * @retval None
+  * @example MCO_Sel(5);  // MCO=PLLRCLK
   *
   */
-
-__INLINE void GPIOA_OSpeed(unsigned int pinNum, unsigned int speed)
+void MCO_Sel(unsigned int src)
 {
-	GPIOA->OSPEEDR &= ~(0x3UL << 2*pinNum);
-	GPIOA->OSPEEDR |= (speed << 2*pinNum);
-}
-
-// --------------------------------------------------------------------------------
-// GPIOB Functions
-// --------------------------------------------------------------------------------
-
-
-/**
-  * @brief  This function selects the alternate function of a GPIOB pin.
-  * @param  pinNum
-  * @param  afNum
-  * @retval None
-  *
-  */
-
-__INLINE void GPIOB_AFSel(unsigned int pinNum, unsigned int afNum)
-{
-	GPIOB->AFR[0] &= ~(0x15UL << 4*pinNum);
-	GPIOB->AFR[0] |= (afNum << 4*pinNum);
-}
-
-// --------------------------------------------------------------------------------
-// GPIOC Functions
-// --------------------------------------------------------------------------------
-
-
-
-/**
-  * @brief  This function selects the alternate function of a GPIOC pin.
-  * @param  pinNum
-  * @param  afNum
-  * @retval None
-  *
-  */
-
-__INLINE void GPIOC_AFSel(unsigned int pinNum, unsigned int afNum)
-{
-	GPIOC->AFR[0] &= ~(0x15UL << 4*pinNum);
-	GPIOC->AFR[0] |= (afNum << 4*pinNum);
-}
-
-// --------------------------------------------------------------------------------
-// GPIOF Functions
-// --------------------------------------------------------------------------------
-
-/**
-  * @brief  This function configures the selected GPIOF pin.
-  * @param  pinNum
-  * @param  pinMode  0 = IN, 1 = OUT, 2 = AF
-  * @retval None
-  *
-  */
-__INLINE void GPIOF_Config(unsigned int pinNum, unsigned int pinMode)
-{
-	// Enable the peripheral clock of GPIOB
-	RCC->IOPENR |= RCC_IOPENR_GPIOFEN;
-
-	// Select output mode
-	GPIOF->MODER &= ~(0x3UL << 2*pinNum);
-	GPIOF->MODER |= (pinMode << 2*pinNum);
-}
-
-/**
-  * @brief  This function toggles GPIOBx pin.
-  * @param  pinNum
-  * @retval None
-  *
-  */
-__INLINE void GPIOB_Toggle(unsigned int pinNum)
-{
-	GPIOB->ODR ^= (0x1UL << pinNum);
-}
-
-// --------------------------------------------------------------------------------
-
-/**
-  * @brief  This function toggles GPIOCx pin.
-  * @param  pinNum
-  * @retval None
-  *
-  */
-__INLINE void GPIOC_Toggle(unsigned int pinNum)
-{
-	GPIOC->ODR ^= (0x1UL << pinNum);
-}
-
-/**
-  * @brief  This function toggles GPIOCx pin.
-  * @param  pinNum
-  * @retval None
-  *
-  */
-__INLINE void GPIOC_Set(unsigned int pinNum)
-{
-	GPIOC->ODR |= (0x1UL << pinNum);
-}
-
-
-/**
-  * @brief  This function toggles GPIOCx pin.
-  * @param  pinNum
-  * @retval None
-  *
-  */
-__INLINE void GPIOC_Reset(unsigned int pinNum)
-{
-	GPIOC->ODR &= ~(0x1UL << pinNum);
-}
-
-/**
-  * @brief  This function configures the selected GPIOB pin.
-  * @param  pinNum
-  * @param  pinMode  0 = IN, 1 = OUT, 2 = AF
-  * @retval None
-  *
-  */
-
-__INLINE void Button_PF2_Config()
-{
-	GPIOF_Config(2, 0);
-
-	GPIOF->PUPDR &= ~(0x3UL << 4);
-	GPIOF->PUPDR |= (0x1UL << 4);
-}
-
-int Button_PF2_In()
-{
-	return (GPIOF->IDR & (1<<2)) >> 2;
-}
-
-/**
-  * @brief  This function toggles GPIOFx pin.
-  * @param  pinNum
-  * @retval None
-  *
-  */
-__INLINE void GPIOF_Toggle(unsigned int pinNum)
-{
-	GPIOF->ODR ^= (0x1UL << pinNum);
-}
-
-/**
-  * @brief  This function switches the system clock to PLL
-  * @retval None
-  *
-  */
-
-void MCO_PLLRCLK_64MHz()
-{
-    uint32_t reg32;
-
-    // PLL disable
-    RCC->CR &= ~RCC_CR_PLLON;
-
-    // HSI oscillator (16 MHz) clock selected as PLL clock entry
-    RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLSRC_Msk;
-    RCC->PLLCFGR |= (RCC_PLLCFGR_PLLSRC_HSI << RCC_PLLCFGR_PLLSRC_Pos);
-
-    // Division factor M of the PLL input clock divider
-    // PLL input frequency after the /M divider must be between 4 and 16 MHz.
-    // PLLM_reg = 0 => PLLM = 1 => 16MHz
-    RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLM_Msk;
-    RCC->PLLCFGR |= (0 << RCC_PLLCFGR_PLLM_Pos);
-
-    // PLL frequency multiplication factor N
-    // The PLL output frequency must be set in the range 64-344 MHz.
-    // PLLN must be between [8-86]
-    // PLLN = 8 => VCO = 16 x 8 = 128 MHz
-    RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLN_Msk;
-    RCC->PLLCFGR |= (8 << RCC_PLLCFGR_PLLN_Pos);
-
-    // PLLR must be between [2-8], PLLRCLK max = 64 MHz
-    // PLLR_reg = 1 => PLLR = 2 => PLLRCLK = 128/2 = 64 MHz
-    RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLR_Msk;
-    RCC->PLLCFGR |= (1 << RCC_PLLCFGR_PLLR_Pos);
-
-    // Main PLL enable
-    RCC->CR |= RCC_CR_PLLON;
-    // Wait until the output is stable:
-    // while ((RCC->CR & RCC_CR_PLLRDY) == 0);
-
-    RCC->PLLCFGR |= RCC_PLLCFGR_PLLREN;
-
     // Select MCO clock = PLLRCLK
     RCC->CFGR &= ~RCC_CFGR_MCOSEL_Msk;
-    RCC->CFGR |= (5 << RCC_CFGR_MCOSEL_Pos);
+    RCC->CFGR |= (src << RCC_CFGR_MCOSEL_Pos);
 }
 
 
-// --------------------------------------------------------------------------------
-// SYSCLK Functions
-// --------------------------------------------------------------------------------
 
-/**
-  * @brief  This configures RCC to set HSI as system clock.
-  * @retval None
-  *
-  */
-__INLINE void RCC_SysClk_HSI(void)
-{
-    uint32_t reg32;
 
-    // Select system clock HSI
-    RCC->CFGR &= ~RCC_CFGR_SW_Msk;
-    RCC->CFGR |= (RCC_CFGR_SWS_HSI << RCC_CFGR_SW_Pos);
 
-    // HSI oscillator on
-    // HSI frequency : 16 MHz
-    RCC->CR |= RCC_CR_HSION;
-    while ((RCC->CR & RCC_CR_HSIRDY) == 0);
-}
 
-// --------------------------------------------------------------------------------
 
-/**
-  * @brief  This function switches the system clock to PLL
-  * @param  pllPreDiv PLL Division M (4-16 MHz)
-  * @param  pllMult PLL multiplication N (16-48 MHz)
-  * @param  sysClkDiv Division R
-  * @retval None
-  *
-  */
 
-void RCC_SysClk_PLL_HSI(unsigned int pllPreDiv, unsigned int pllMult, unsigned int sysClkDiv)
-{
-    uint32_t reg32;
 
-    // HSI oscillator (16 MHz) clock selected as PLL clock entry
-    RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLSRC_Msk;
-    RCC->PLLCFGR |= (RCC_PLLCFGR_PLLSRC_HSI << RCC_PLLCFGR_PLLSRC_Pos);
 
-    // Division factor M of the PLL input clock divider
-    // PLL input frequency after the /M divider must be between 2.66 and 16 MHz.
-    RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLM_Msk;
-    RCC->PLLCFGR |= ((pllPreDiv-1) << RCC_PLLCFGR_PLLM_Pos);
 
-    // PLL frequency multiplication factor N
-    // The PLL output frequency must be set in the range 64-344 MHz.
-    // PLLN must be between [8-86]
-    RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLN_Msk;
-    RCC->PLLCFGR |= (pllMult << RCC_PLLCFGR_PLLN_Pos);
 
-    // SysClk must be max. 64 MHz
-    // PLLR must be between [2-8]
-    RCC->PLLCFGR &= ~RCC_PLLCFGR_PLLR_Msk;
-    RCC->PLLCFGR |= ((sysClkDiv-1) << RCC_PLLCFGR_PLLR_Pos);
 
-    RCC->PLLCFGR |= RCC_PLLCFGR_PLLREN;
 
-    // Main PLL enable
-    RCC->CR |= RCC_CR_PLLON;
-    // Wait until the output is stable:
-    while ((RCC->CR & RCC_CR_PLLRDY) == 0);
 
-    // Select system clock: PLL
-    RCC->CFGR &= ~RCC_CFGR_SW_Msk;
-    RCC->CFGR |= (2 << RCC_CFGR_SW_Pos);
-
-    // Wait until the PLL is switched on
-    while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
-
-}
-
-// --------------------------------------------------------------------------------
-// TIMER Functions
-// --------------------------------------------------------------------------------
-
-/**
-  * @brief  This function switches the system clock to PLL
-  * @param  arr
-  * @retval None
-  *
-  */
-
-void TIM3_CH1_PWM(uint32_t arr, uint32_t ccr)
-{
-	RCC->APBENR1 |= RCC_APBENR1_TIM3EN;
-
-	TIM3->PSC = 1;
-	TIM3->ARR = arr;
-	TIM3->CCR1 = ccr;
-
-	// 0110: PWM mode 1 - Channel 1 is active as long as TIMx_CNT < TIMx_CCR1 else inactive.
-	TIM3->CCMR1 &= ~TIM_CCMR1_OC1M_Msk;
-	TIM3->CCMR1 |= (6 << TIM_CCMR1_OC1M_Pos);
-
-	TIM3->CCMR1 |= TIM_CCMR1_OC1CE;
-
-	// Enable CH1
-	TIM3->CCER |= TIM_CCER_CC1E;
-
-	// Enable counter
-	TIM3->CR1 |= TIM_CR1_CEN;
-}
 
 void TIM3_UIF_IRQ(uint32_t arr)
 {
