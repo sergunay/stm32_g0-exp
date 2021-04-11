@@ -34,12 +34,17 @@ int main(void)
 	// Select AF1 for GPIOA(2)
 	GPIO_AFSel(GPIOA, 3, 1);
 
-	USART2_Setup(16000000, 9600, 'O');
+	// USART2 Enable
+	USART2_Enable();
+	// USART Config
+	USART_Config(USART2, 16000000, 9600, 'O');
+	// USART transmit enable
+	USART_Tx_En(USART2);
 
 	while (1)
 	{
-		USART2_Write("Hello world!!!\r\n");
-		Delay_Loop(100);
+		USART_Print(USART2, "Hello World!\r\n");
+		Delay_Loop(1000);
 	}
 
 	return 0;

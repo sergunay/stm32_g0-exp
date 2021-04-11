@@ -52,69 +52,82 @@ __INLINE void GPIO_AFSel(GPIO_TypeDef *PORT, unsigned int pinNum, unsigned int a
 // USART Functions
 // --------------------------------------------------------------------------------
 
+
 /**
-  * @brief  USART2 Setup
+  * @brief  USART2 Enable
+  * @retval None
+  * @example USART2_Enable(); // Enable USART clk
+  *
+  */
+__INLINE void USART2_Enable()
+{
+    // USART2 clk enable
+	RCC->APBENR1 |= RCC_APBENR1_USART2EN;
+    // USART Enable
+	USART2->CR1 |= USART_CR1_UE;
+}
+
+/**
+  * @brief  USART transmit enable
+  * @retval None
+  * @example USART_Tx_En(USART2); // Enable USART clk
+  *
+  */
+__INLINE void USART_Tx_En(USART_TypeDef *USART)
+{
+	USART->CR1 |= USART_CR1_TE;
+}
+
+/**
+  * @brief  USART config
   * @param  sys_clk_freq system clock frequency
   * @param  uart_baud_rate baud rate
   * @param  parity 0:No parity, O:odd, E:even
-  * @example USART2_Setup(16000000, 9600, 'O');
+  * @example USART_Config(USART2, 16000000, 9600, 'O');
   *
   */
-__INLINE void USART2_Setup(int sys_clk_freq, int uart_baud_rate, char parity)
+__INLINE void USART_Config(USART_TypeDef *USART, int sys_clk_freq, int uart_baud_rate, char parity)
 {
-	RCC->APBENR1 |= RCC_APBENR1_USART2EN;
-
-	// RXNE Interrupt Enable
-	USART1->CR1 |= USART_CR1_RXNEIE_RXFNEIE;
     // Baud rate
-	USART2->BRR = (uint32_t)(sys_clk_freq/uart_baud_rate);
-	// Transmitter Enable
-	USART2->CR1 |= USART_CR1_TE;
-	// Receiver Enable
-	USART2->CR1 |= USART_CR1_RE;
-    
-    // USART Enable
-	USART2->CR1 |= USART_CR1_UE;
+	USART->BRR = (uint32_t)(sys_clk_freq/uart_baud_rate);
 
 	switch (parity) 
 	{
 		case 'O':
 			// Parity control enable
-			USART2->CR1 |= USART_CR1_PCE;
+			USART->CR1 |= USART_CR1_PCE;
 			// PS=1 => odd parity
-			USART2->CR1 |= USART_CR1_PS;
+			USART->CR1 |= USART_CR1_PS;
 			break;
 		case 'E':
 			// Parity control enable
-			USART2->CR1 |= USART_CR1_PCE;
+			USART->CR1 |= USART_CR1_PCE;
 			// PS=0 => even parity
-			USART2->CR1 &= ~USART_CR1_PS;
+			USART->CR1 &= ~USART_CR1_PS;
 			break;
 		default:
 			// Parity control enable
-			USART2->CR1 |= USART_CR1_PCE;
+			USART->CR1 |= USART_CR1_PCE;
 			// PS=1 => odd parity
-			USART2->CR1 |= USART_CR1_PS;
+			USART->CR1 |= USART_CR1_PS;
 	}
-
-
 }
 
 /**
-  * @brief  USART write
+  * @brief  USART print
   * @param  *text
   * @retval None
-  * @example USART2_Write("Hello World!!!\r\n");
+  * @example USART2_Print("Hello World!!!\r\n");
   *
   */
-__INLINE void USART2_Write(const char *text)
+__INLINE void USART_Print(USART_TypeDef *USART, const char *text)
 {
 	const char *tx_ptr = text;
 	while(*tx_ptr) 
 	{
-		USART2->TDR = *tx_ptr;
+		USART->TDR = *tx_ptr;
 		// Wait until Transmit Data Register Empty 
-		while ((USART2->ISR & USART_ISR_TXE_TXFNF) == 0);
+		while ((USART->ISR & USART_ISR_TXE_TXFNF) == 0);
 		tx_ptr++;
 	}
 }
