@@ -18,6 +18,8 @@
 #include "stm32g031xx.h"
 #include "mylib.h"
 
+int cnt = 0;
+
 int main(void)
 {
 	// Config PA2, AF1 USART2_TX
@@ -41,10 +43,15 @@ int main(void)
 	// USART transmit enable
 	USART_Tx_En(USART2);
 
+
 	while (1)
 	{
-		USART_Print(USART2, "Hello World!\r\n");
-		Delay_Loop(1000);
+		for(cnt=1; cnt<10000; cnt++)
+		{
+			USART_Print_Int(USART2, cnt);
+			USART_Print(USART2, " \n\r");
+			Delay_Loop(1000);
+		}
 	}
 
 	return 0;
