@@ -5,8 +5,8 @@
   * @brief   UART
   *
   * 1. Hardware: 
-  *    STM32G0 Discovery Board.
-  * 2. This file configures the system clock as follows:
+  *    STM32 Nucleo-32 development board with STM32G031K8 MCU
+  * 2. System Clock:
   *    System Clock source  | HSI
   *    SYSCLK(MHz)          | 16
   * 3. USART2 (PA2/PA3) connected to ST-LINK/V2-1 Virtual COM port.
@@ -43,10 +43,13 @@ int main(void)
 	// USART transmit enable
 	USART_Tx_En(USART2);
 
+	USART_Print_Int(USART2, 12345678);
+	USART_Print(USART2, " \n\r");
+	USART_Print_Int(USART2, 123456789);
 
 	while (1)
 	{
-		for(cnt=1; cnt<10000; cnt++)
+		for(cnt=0; cnt<10000; cnt++)
 		{
 			USART_Print_Int(USART2, cnt);
 			USART_Print(USART2, " \n\r");

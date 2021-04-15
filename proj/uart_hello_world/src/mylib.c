@@ -52,7 +52,6 @@ __INLINE void GPIO_AFSel(GPIO_TypeDef *PORT, unsigned int pinNum, unsigned int a
 // USART Functions
 // --------------------------------------------------------------------------------
 
-
 /**
   * @brief  USART2 Enable
   * @retval None
@@ -132,32 +131,47 @@ __INLINE void USART_Print(USART_TypeDef *USART, const char *text)
 	}
 }
 
+/**
+  * @brief  USART print integer
+  * @param  USART USART1, USART2
+  * @param  num number to be printed
+  * @retval None
+  * @example USART_Print_Int(USART2, 123456789);
+  *
+  */
+
 void USART_Print_Int(USART_TypeDef *USART, int num)
 {
 	char numdigits[10];
   char temp;
-	char digit_idx;
+	char digit_idx=0;
   char i=0;
 
-  	digit_idx = 0;
-		while(num > 0)
-		{
-			numdigits[digit_idx] = num%10 + 48;
-			num = num/10;
-			digit_idx++;
-		}
-    digit_idx--;
-    if(digit_idx>0)
+  if(num == 0)
+  {
+    numdigits[0] = 48;
+    numdigits[1] = 0;
+    digit_idx++;
+  }
+
+  while(num > 0)
+  {
+    numdigits[digit_idx] = num%10 + 48;
+    num = num/10;
+    digit_idx++;
+  }
+  digit_idx--;
+  if(digit_idx>0)
+  {
+    for(i=0; i<=digit_idx/2; i++)
     {
-      for(i=0; i<=digit_idx/2; i++)
-      {
-        temp = numdigits[i];
-        numdigits[i] = numdigits[digit_idx-i];
-        numdigits[digit_idx-i] = temp;
-      }
+      temp = numdigits[i];
+      numdigits[i] = numdigits[digit_idx-i];
+      numdigits[digit_idx-i] = temp;
     }
-    numdigits[digit_idx+1] = 0;
-    USART_Print(USART, numdigits);
+  }
+  numdigits[digit_idx+1] = 0;
+  USART_Print(USART, numdigits);
 }
 
 /**
