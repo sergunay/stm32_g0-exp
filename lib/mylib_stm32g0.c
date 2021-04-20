@@ -21,7 +21,7 @@ __INLINE void GPIO_Enable(unsigned int portNum)
   * @brief  Select GPIO mode
   * @param  PORT GPIOA, GPIOB, GPIOC, GPIOD, GPIOF
   * @param  pinNum
-  * @param  pinMode 0:IN, 1:OUT, 2:AF
+  * @param  pinMode 0:IN, 1:OUT, 2:AF, 3:Analog
   * @retval None
   * @example GPIO_Mode(GPIOC, 6, 1);
   *
@@ -118,28 +118,20 @@ __INLINE void TIM3_Enable()
 	RCC->APBENR1 |= RCC_APBENR1_TIM3EN;
 }
 
+
 /**
-  * @brief  This function switches the system clock to PLL
-  * @param  arr
+  * @brief  This function selects the alternate function of a GPIO pin.
+  * @param  TIM
+  * @param  mode  3: Toggle - out toggles when TIMx_CNT=TIMx_CCR1.
+  *               6: PWM mode 1 - H if TIMx_CNT < TIMx_CCR1 else L.
   * @retval None
+  * @example TIM_CH1_Mode(TIM3, 6); // TIM3CH1 PWM mode
   *
   */
-
-void TIM3_CH1_PWM(uint32_t arr, uint32_t ccr)
+__INLINE void TIM_CH1_Mode(TIM_TypeDef *TIM, unsigned int mode)
 {
-	TIM3->PSC = 1;
-	TIM3->ARR = arr;
-	TIM3->CCR1 = ccr;
-
-	// 0110: PWM mode 1 - Channel 1 is active as long as TIMx_CNT < TIMx_CCR1 else inactive.
 	TIM3->CCMR1 &= ~TIM_CCMR1_OC1M_Msk;
-	TIM3->CCMR1 |= (6 << TIM_CCMR1_OC1M_Pos);
-
-	// Enable CH1
-	TIM3->CCER |= TIM_CCER_CC1E;
-
-	// Enable counter
-	TIM3->CR1 |= TIM_CR1_CEN;
+	TIM3->CCMR1 |= (mode << TIM_CCMR1_OC1M_Pos);
 }
 
 // --------------------------------------------------------------------------------
@@ -271,7 +263,7 @@ __INLINE void USART_Config(USART_TypeDef *USART, int sys_clk_freq, int uart_baud
   * @brief  USART print
   * @param  *text
   * @retval None
-  * @example USART2_Print("Hello World!!!\r\n");
+  * @example USART_Print(USART2, "Hello World!!!\r\n");
   *
   */
 __INLINE void USART_Print(USART_TypeDef *USART, const char *text)
@@ -284,6 +276,70 @@ __INLINE void USART_Print(USART_TypeDef *USART, const char *text)
 		while ((USART->ISR & USART_ISR_TXE_TXFNF) == 0);
 		tx_ptr++;
 	}
+}
+
+/**
+  * @brief  USART print integer
+  * @param  USART USART1, USART2
+  * @param  num number to be printed
+  * @retval None
+  * @example USART_Print_Int(USART2, 123456789);
+  *
+  */
+
+void USART_Print_Int(USART_TypeDef *USART, int num)
+{
+	char numdigits[10];
+  char temp;
+	char digit_idx=0;
+  char i=0;
+
+  if(num == 0)
+  {
+    numdigits[0] = 48;
+    numdigits[1] = 0;
+    digit_idx++;
+  }
+
+  while(num > 0)
+  {
+    numdigits[digit_idx] = num%10 + 48;
+    num = num/10;
+    digit_idx++;
+  }
+  digit_idx--;
+  if(digit_idx>0)
+  {
+    for(i=0; i<=digit_idx/2; i++)
+    {
+      temp = numdigits[i];
+      numdigits[i] = numdigits[digit_idx-i];
+      numdigits[digit_idx-i] = temp;
+    }
+  }
+  numdigits[digit_idx+1] = 0;
+  USART_Print(USART, numdigits);
+}
+
+// --------------------------------------------------------------------------------
+// ADC Functions
+// --------------------------------------------------------------------------------
+
+__INLINE void ADC_Config(unsigned int chNum)    // PA0 = ADC IN 0
+{
+    uint32_t reg32;
+    RCC->APBENR2 |= RCC_APBENR2_ADCEN;
+    ADC1->SMPR = ADC_SMPR_SMP1_0;    // 001: 7.5 ADC clock cycles
+    ADC1->CHSELR |= (1 << chNum);
+    ADC1->CR |= ADC_CR_ADEN;
+}
+
+int ADC_Read(void)
+{
+    ADC1->CR |= ADC_CR_ADSTART;
+    while(ADC1->CR & ADC_CR_ADSTART);
+    while ((ADC1->ISR & ADC_ISR_EOC) == 0);
+    return (int) ADC1->DR;
 }
 
 // --------------------------------------------------------------------------------

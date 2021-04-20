@@ -17,6 +17,10 @@ void USART_Print(USART_TypeDef *, const char *);
 
 
 void TIM3_Enable();
+void TIM_CH1_Mode(TIM_TypeDef *, unsigned int);
+
+int ADC_Read(void);
+void ADC_Config(unsigned int);
 
 void Delay_Loop(unsigned int);
 
