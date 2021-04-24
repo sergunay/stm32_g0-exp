@@ -70,20 +70,18 @@ Max frequency at 64 MHz.
 
 ### Frequency measurement
 
+TODO
 
 ### USART
 
+Printing text and numbers.
 
 ### I2C
 
+Reading temperature from TMP102 with I2C and transferring it to serial port.
 
 ### SPI
 
-
-
-
-
-
-
+TODO
 
 
