@@ -4,7 +4,7 @@
 uint16_t GPIOB_Mask = 0x033F;   // 0000_0011_0011_1111
                                 //        HG   FE DCBA 
 
-uint16_t GPIOA_Mask = 0x000F;   // 0000_0000_0011_0011
+uint16_t GPIOA_Mask = 0x0033;   // 0000_0000_0011_0011
                                 //             54   10 
 
 const uint16_t SEG7[]={
@@ -21,6 +21,7 @@ const uint16_t SEG7[]={
 };
 
 int digit = 0;
+unsigned int num=0;
 
 int main(void)
 {
@@ -41,23 +42,93 @@ int main(void)
 	GPIO_Mode(GPIOA, 4, 1);
 	GPIO_Mode(GPIOA, 5, 1);
 
-	GPIOA->ODR &= ~GPIOA_Mask;
-    GPIOA->ODR |= 0x0032;
-	
+	// Select PB6 mode: AF
+	GPIO_Mode(GPIOB, 6, 2);
+	// Select PB6 AF: AF6 (I2C_SCL)
+	GPIO_AFSel(GPIOB, 6, 6);
+
+	// Select PB7 mode: AF
+	GPIO_Mode(GPIOB, 7, 2);
+	// Select PB6 AF: AF6 (I2C_SDA)
+	GPIO_AFSel(GPIOB, 7, 6);
+
+	// I2C initialization: standard mode, 100kHz
+
+	// I2C1 clock enable
+	I2C1_Enable();
+
+	// Config I2C1 for 100 MHz
+	I2C_Config_100MHz(I2C1); 
+
+	// Number of bytes
+	I2C1->CR2 &= ~I2C_CR2_NBYTES_Msk; 
+	I2C1->CR2 |= (1 << I2C_CR2_NBYTES_Pos);
+
+	I2C1->CR2 &= ~I2C_CR2_AUTOEND;
+	I2C1->CR2 &= ~I2C_CR2_RELOAD;
+
 
 	while (1)
 	{
+		num = I2C_Read_Byte(I2C1, 0x48, 0x0);
+
+		// digit 0
+
+        digit = num%10;
+        num = num/10;
+		
 		GPIOB->ODR &= ~GPIOB_Mask;
-    	GPIOB->ODR |= SEG7[digit];
-		Delay_Loop(500);
-		if(digit<9)
-		{
-			digit++;
-		}
-		else 
-		{
-			digit = 0;
-		}
+		GPIOB->ODR |= SEG7[digit];
+		GPIOA->ODR &= ~GPIOA_Mask;
+		GPIOA->ODR |= 0x0032;
+		
+		Delay_Loop(10);
+
+		if(num == 0)
+			continue;
+
+		// digit 1
+
+		digit = num%10;
+        num = num/10;
+
+		GPIOB->ODR &= ~GPIOB_Mask;
+		GPIOB->ODR |= SEG7[digit];
+		GPIOA->ODR &= ~GPIOA_Mask;
+		GPIOA->ODR |= 0x0031;
+
+		Delay_Loop(10);
+
+		if(num == 0)
+			continue;
+
+		// digit 2
+
+		digit = num%10;
+        num = num/10;
+
+		GPIOB->ODR &= ~GPIOB_Mask;
+		GPIOB->ODR |= SEG7[digit];
+		GPIOA->ODR &= ~GPIOA_Mask;
+		GPIOA->ODR |= 0x0023;
+
+		Delay_Loop(10);
+
+		if(num == 0)
+			continue;
+
+		// digit 3
+
+		digit = num%10;
+        num = num/10;
+
+		GPIOB->ODR &= ~GPIOB_Mask;
+		GPIOB->ODR |= SEG7[digit];
+		GPIOA->ODR &= ~GPIOA_Mask;
+		GPIOA->ODR |= 0x0013;
+
+		Delay_Loop(10);
+			
 	}
 
 	return 0;
