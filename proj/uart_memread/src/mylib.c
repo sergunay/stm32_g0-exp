@@ -73,27 +73,54 @@ int GPIO_Read_Bit(GPIO_TypeDef *PORT, unsigned int pinNum)
 int GPIO_Read_Bus(GPIO_TypeDef *PORT)
 {
   int data_word=0;
-  char data_bit=0;
 
-  data_bit = PORT->IDR & 3;
+  data_word = PORT->IDR & 3;
   // +DATA[2] @PA4
-  data_bit += 4*(PORT->IDR & (1<<4));
+  data_word += 4*(PORT->IDR & (1<<4));
   // +DATA[3] @PA5
-  data_bit += 8*(PORT->IDR & (1<<5));
+  data_word += 8*(PORT->IDR & (1<<5));
   // +DATA[4] @PA12
-  data_bit += 16*(PORT->IDR & (1<<12));
+  data_word += 16*(PORT->IDR & (1<<12));
   // +DATA[5] @PA11
-  data_bit += 32*(PORT->IDR & (1<<11));
+  data_word += 32*(PORT->IDR & (1<<11));
   // +DATA[6] @PA6
-  data_bit += 64*(PORT->IDR & (1<<6));
+  data_word += 64*(PORT->IDR & (1<<6));
   // +DATA[7] @PA7
-  data_bit += 128*(PORT->IDR & (1<<7));
+  data_word += 128*(PORT->IDR & (1<<7));
   // +DATA[8] @PA15
-  data_bit += 256*(PORT->IDR & (1<<15));
+  data_word += 256*(PORT->IDR & (1<<15));
   // +DATA[9] @PA10
-  data_bit += 512*(PORT->IDR & (1<<15));
+  data_word += 512*(PORT->IDR & (1<<15));
 
-	return data_bit;
+	return data_word;
+}
+
+/**
+  * @brief   Read bit from a IDR of a PORT/PIN
+  * @param   PORT GPIOA, GPIOB, GPIOC, GPIOD, GPIOF
+  * @param   pinNum
+  * @param   val 0, 1
+  * @example GPIO_Write_Bit(GPIOC, 6, 1); // Write 1 to GPIOC(6) - User LED
+  * @retval  None
+  *
+  */
+void GPIO_Write_Bit(GPIO_TypeDef *PORT, unsigned int pinNum, unsigned int val)
+{
+  PORT->ODR &= ~(1 << pinNum);
+	PORT->ODR |= (val << pinNum);
+}
+
+/**
+  * @brief  Delay in loop
+  * @param  time
+  * @retval None
+  * @example Delay_Loop(100);
+  *
+  */
+void Delay_Loop(unsigned int time)
+{
+	for (unsigned int i = 0; i < time; i++)
+		for (volatile unsigned int j = 0; j < 1000; j++);
 }
 
 // --------------------------------------------------------------------------------

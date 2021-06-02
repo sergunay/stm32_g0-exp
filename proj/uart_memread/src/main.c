@@ -16,6 +16,7 @@
   *    PA5 :IN  - DATA[3];    PA12:IN - DATA[4];    PA11:IN - DATA[5];
   *    PA6 :IN  - DATA[6];    PA7 :IN - DATA[7];    PA15:IN - DATA[8];
   *    PA10:IN  - DATA[9];    PA9 :OUT- read_en;    PA8 :OUT- read_clk;
+  *    PB0 :OUT - adcmem_rst;
   *    PF2 :IN  - User Button (B1) -- needs Pull Up
   *    PC6 :OUT - User LED (LD3)
   * 5. UART configuration:
@@ -37,7 +38,8 @@
 #include "stm32g031xx.h"
 #include "mylib.h"
 
-int data_cnt = 0;
+int data_idx = 0;
+int adc_data = 0;
 
 char button_pressed = 0;
 
@@ -89,6 +91,11 @@ int main(void)
 	// GPIOF clk enable
 	GPIO_Enable(5);
 
+  // GPIOB clock enable
+	GPIO_Enable(1);
+	// Set GPIOB(0) Out Mode -- adcmem_reset
+	GPIO_Mode(GPIOB, 0, 1);
+
   // Configure user button (User Button (B1))
 	// GPIOF(2) : input
 	GPIO_Mode(GPIOF, 2, 0);
@@ -106,6 +113,14 @@ int main(void)
 
 	USART_Print(USART2, "Start");
 
+  // Send reset signal
+  GPIO_Write_Bit(GPIOB, 0, 1);
+  Delay_Loop(100);
+  GPIO_Write_Bit(GPIOB, 0, 0);
+
+  // PA9, read_en=0
+  GPIO_Write_Bit(GPIOA, 9, 0);
+
 	while (1)
 	{
     button_pressed = 0;
@@ -114,10 +129,24 @@ int main(void)
       button_pressed = GPIO_Read_Bit(GPIOF, 2);
     }
 
-		for(data_cnt=0; data_cnt<4095; data_cnt++)
+    // PA9, read_en=1 
+    GPIO_Write_Bit(GPIOA, 9, 1);
+
+		for(data_idx=0; data_idx<4096; data_idx++)
 		{
-			USART_Print_Int(USART2, data_cnt);
+      // PA8, read_clk=1 (rising edge)
+      GPIO_Write_Bit(GPIOA, 8, 1);
+      // wait for data
+      Delay_Loop(1000);
+
+      adc_data = GPIO_Read_Bus(GPIOA);
+			USART_Print_Int(USART2, adc_data);
+      
 			USART_Print(USART2, " \n\r");
+
+      // PA8, read_clk=0 (falling edge)
+      GPIO_Write_Bit(GPIOA, 8, 0);
+      
 			Delay_Loop(1000);
 		}
 	}
