@@ -74,23 +74,56 @@ int GPIO_Read_Bus(GPIO_TypeDef *PORT)
 {
   int data_word=0;
 
-  data_word = PORT->IDR & 3;
+  // +DATA[0] @PA0
+  if(PORT->IDR & 1 != 0)
+  {
+    data_word += 1;
+  }
+  // +DATA[1] @PA1
+  if(PORT->IDR & (1<<1) != 0)
+  {
+    data_word += 2;
+  }
   // +DATA[2] @PA4
-  data_word += 4*(PORT->IDR & (1<<4));
+  if(PORT->IDR & (1<<4) != 0)
+  {
+    data_word += 4;
+  }
   // +DATA[3] @PA5
-  data_word += 8*(PORT->IDR & (1<<5));
+  if(PORT->IDR & (1<<5) != 0)
+  {
+    data_word += 8;
+  }
   // +DATA[4] @PA12
-  data_word += 16*(PORT->IDR & (1<<12));
+  if(PORT->IDR & (1<<12) != 0)
+  {
+    data_word += 16;
+  }
   // +DATA[5] @PA11
-  data_word += 32*(PORT->IDR & (1<<11));
+  if(PORT->IDR & (1<<11) != 0)
+  {
+    data_word += 32;
+  }
   // +DATA[6] @PA6
-  data_word += 64*(PORT->IDR & (1<<6));
+  if(PORT->IDR & (1<<6) != 0)
+  {
+    data_word += 64;
+  }
   // +DATA[7] @PA7
-  data_word += 128*(PORT->IDR & (1<<7));
+  if(PORT->IDR & (1<<7) != 0)
+  {
+    data_word += 128;
+  }
   // +DATA[8] @PA15
-  data_word += 256*(PORT->IDR & (1<<15));
+  if(PORT->IDR & (1<<15) != 0)
+  {
+    data_word += 256;
+  }
   // +DATA[9] @PA10
-  data_word += 512*(PORT->IDR & (1<<15));
+  if(PORT->IDR & (1<<10) != 0)
+  {
+    data_word += 512;
+  }
 
 	return data_word;
 }
@@ -247,17 +280,4 @@ void USART_Print_Int(USART_TypeDef *USART, int num)
   }
   numdigits[digit_idx+1] = 0;
   USART_Print(USART, numdigits);
-}
-
-/**
-  * @brief  Delay in loop
-  * @param  time
-  * @retval None
-  * @example Delay_Loop(100);
-  *
-  */
-void Delay_Loop(unsigned int time)
-{
-	for (unsigned int i = 0; i < time; i++)
-		for (volatile unsigned int j = 0; j < 1000; j++);
 }

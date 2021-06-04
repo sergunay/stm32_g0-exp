@@ -88,6 +88,11 @@ int main(void)
   // Set GPIOA(0) INPUT Mode  -- DATA[9]
 	GPIO_Mode(GPIOA, 10, 0);
 
+  // Set GPIOA(8) OUTPUT Mode  -- read_clk
+  GPIO_Mode(GPIOA, 8, 1);
+  // Set GPIOA(9) OUTPUT Mode  -- read_en
+  GPIO_Mode(GPIOA, 9, 1);
+
 	// GPIOF clk enable
 	GPIO_Enable(5);
 
@@ -126,7 +131,10 @@ int main(void)
     button_pressed = 0;
     while(button_pressed == 0)
     {
-      button_pressed = GPIO_Read_Bit(GPIOF, 2);
+      if(GPIO_Read_Bit(GPIOF, 2) == 0)
+      {
+        button_pressed = 1;
+      }
     }
 
     // PA9, read_en=1 
@@ -136,18 +144,21 @@ int main(void)
 		{
       // PA8, read_clk=1 (rising edge)
       GPIO_Write_Bit(GPIOA, 8, 1);
+      GPIO_Write_Bit(GPIOC, 6, 1);
       // wait for data
-      Delay_Loop(1000);
+      Delay_Loop(6);
 
       adc_data = GPIO_Read_Bus(GPIOA);
 			USART_Print_Int(USART2, adc_data);
       
 			USART_Print(USART2, " \n\r");
 
+
       // PA8, read_clk=0 (falling edge)
       GPIO_Write_Bit(GPIOA, 8, 0);
+      GPIO_Write_Bit(GPIOC, 6, 0);
       
-			Delay_Loop(1000);
+			Delay_Loop(10);
 		}
 	}
 
