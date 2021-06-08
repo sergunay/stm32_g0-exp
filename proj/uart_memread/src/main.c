@@ -21,7 +21,10 @@
   *    PC6 :OUT - User LED (LD3)
   * 5. UART configuration:
   *        Baud=9600, parity=odd
-  * 6. Algorithm:
+  * 6. SPI Configuration:
+  *        PB0.AF0=SPI1_NSS  PB3.AF0=SPI1_SCK  PB4.AF0=SPI1_MISO  PB5.AF0=SPI1_MOSI
+  *        
+  * 7. Algorithm:
   *    1. Poll user button at PF2, LED off, read_en=0
   *    2. If PF2 HIGH, LED on, for loop data_idx in 0 to 4096:
   *       * read_en=1
@@ -120,13 +123,65 @@ int main(void)
 
   // Send reset signal
   GPIO_Write_Bit(GPIOB, 0, 1);
-  Delay_Loop(100);
+  Delay_Loop(10);
   GPIO_Write_Bit(GPIOB, 0, 0);
 
   // PA9, read_en=0
   GPIO_Write_Bit(GPIOA, 9, 0);
 
-	while (1)
+  // --------------------------- SPI BEGIN ------------------------//
+
+  // SPI pins
+  GPIO_Mode(GPIOB, 0, 2);
+  GPIO_Mode(GPIOB, 3, 2);
+  GPIO_Mode(GPIOB, 4, 2);
+  GPIO_Mode(GPIOB, 5, 2);
+
+  // GPIO speed max 80 MHz
+	GPIO_Speed(GPIOB, 0, 3);
+  GPIO_Speed(GPIOB, 3, 3);
+  GPIO_Speed(GPIOB, 4, 3);
+  GPIO_Speed(GPIOB, 5, 3);
+
+  // SPI1 clk enable
+	RCC->APBENR2 |= RCC_APBENR2_SPI1EN;
+
+  // Configure the serial clock baud rate
+  // 000
+  SPI1->CR1 &= ~SPI_CR1_BR_Msk;
+  SPI1->CR1 |= SPI_CR1_BR_1; // f_PCLK/8 = 16/8=2MHz
+  SPI1->CR1 |= SPI_CR1_BR_0; // f_PCLK/8 = 16/8=2MHz
+
+  // Configure the CPOL and CPHA bits combination
+
+  // Select simplex or half-duplex mode
+
+  // Configure the LSBFIRST bit to define the frame format
+
+  // Configure SSM and SSI
+
+  // Configure the MSTR bit
+  SPI1->CR1 |= SPI_CR1_MSTR;
+
+  // Configure the DS[3:0] bits to select the data length for the transfer.
+  SPI1->CR2 &= ~SPI_CR2_DS_Msk;
+  // 1111: 16-bit
+  SPI1->CR2 |= (15 << SPI_CR2_DS_Pos);
+
+  // SPI en
+  SPI1->CR1 |= SPI_CR1_SPE;
+
+  // SPI1->CR2 |= SPI_CR2_SSOE;
+
+  SPI1->DR = 0x1234;
+  // wait if transmit buffer is not empty
+  while(SPI1->SR & SPI_SR_TXE == 0)
+  {
+  }
+
+// --------------------------- SPI END ------------------------//
+
+  while (1)
 	{
     button_pressed = 0;
     while(button_pressed == 0)

@@ -49,6 +49,21 @@ __INLINE void GPIO_AFSel(GPIO_TypeDef *PORT, unsigned int pinNum, unsigned int a
 }
 
 /**
+  * @brief  Select GPIO speed
+  * @param  PORT GPIOA, GPIOB, GPIOC, GPIOD, GPIOF
+  * @param  pinNum
+  * @param  speed 0:3MHz; 1:15MHz; 2:60 MHz; 3:80 MHz
+  * @retval None
+  * @example GPIO_Speed(GPIOA, 9, 3);
+  *
+  */
+__INLINE void GPIO_Speed(GPIO_TypeDef *PORT, unsigned int pinNum, unsigned int speed)
+{
+	PORT->OSPEEDR &= ~(0x3UL << 2*pinNum);
+	PORT->OSPEEDR |= (speed << 2*pinNum);
+}
+
+/**
   * @brief   Read bit from a IDR of a PORT/PIN
   * @param   PORT GPIOA, GPIOB, GPIOC, GPIOD, GPIOF
   * @param   pinNum

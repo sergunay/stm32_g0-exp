@@ -2,6 +2,7 @@ void GPIO_Enable(unsigned int);
 void GPIO_Mode(GPIO_TypeDef *, unsigned int, unsigned int);
 void GPIO_Toggle(GPIO_TypeDef *, unsigned int);
 void GPIO_AFSel(GPIO_TypeDef *, unsigned int, unsigned int);
+void GPIO_Speed(GPIO_TypeDef *, unsigned int, unsigned int);
 int GPIO_Read_Bit(GPIO_TypeDef *, unsigned int );
 void GPIO_Write_Bit(GPIO_TypeDef *, unsigned int, unsigned int);
 int GPIO_Read_Bus(GPIO_TypeDef *);
