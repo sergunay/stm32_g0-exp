@@ -296,3 +296,64 @@ void USART_Print_Int(USART_TypeDef *USART, int num)
   numdigits[digit_idx+1] = 0;
   USART_Print(USART, numdigits);
 }
+
+// --------------------------------------------------------------------------------
+// SPI Functions
+// --------------------------------------------------------------------------------
+
+/**
+  * @brief  SPI1 Enable
+  * @retval None
+  * @example SPI1_Enable(); // Enable SPI1 clk
+  *
+  */
+  void SPI1_Enable()
+  {
+    // SPI1 clk enable
+	  RCC->APBENR2 |= RCC_APBENR2_SPI1EN;
+  }
+
+
+/**
+  * @brief  SPI config
+  * @param  data_nbits data length
+  * @param  pclk_div 0: div2, 1: div4, 2: div8
+  * @example SPI_Config(SPI1, 16, 2);
+  *
+  */
+__INLINE void SPI_Config(SPI_TypeDef *SPI, int data_nbits, int pclk_div)
+{
+  // Configure the serial clock baud rate
+  SPI->CR1 &= ~SPI_CR1_BR_Msk;
+  SPI->CR1 |= (pclk_div<<SPI_CR1_BR_Pos); // f_PCLK/8 = 16/8=2MHz
+
+  // Configure SSM and SSI
+  SPI->CR1 |= SPI_CR1_SSM;
+  SPI->CR1 |= SPI_CR1_SSI;
+
+  // Configure the MSTR bit
+  SPI->CR1 |= SPI_CR1_MSTR;
+
+  // Configure the DS[3:0] bits to select the data length for the transfer.
+  SPI->CR2 &= ~SPI_CR2_DS_Msk;
+  SPI->CR2 |= ((data_nbits-1) << SPI_CR2_DS_Pos);
+
+  // SPI en
+  SPI->CR1 |= SPI_CR1_SPE;
+}
+
+/**
+  * @brief  SPI transmit data
+  * @param  data
+  * @retval None
+  * @example SPI_Tx_Data(SPI1, 0x1234);
+  *
+  */
+__INLINE void SPI_Tx_Data(SPI_TypeDef *SPI, int data)
+{
+  SPI1->DR = data;
+  // wait if transmit buffer is not empty
+  while(SPI1->SR & SPI_SR_TXE == 0)
+  {
+  }
+}

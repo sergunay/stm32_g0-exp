@@ -12,3 +12,6 @@ void USART2_Enable(void);
 void USART_Print(USART_TypeDef *, const char *);
 void USART_Print_Int(USART_TypeDef *USART, int);
 void Delay_Loop(unsigned int);
+void SPI1_Enable(void);
+void SPI_Config(SPI_TypeDef *, int, int);
+void SPI_Tx_Data(SPI_TypeDef *, int);
